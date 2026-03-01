@@ -1,0 +1,168 @@
+/* Customer App CSS */
+
+/* Import Bootstrap */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css');
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap');
+
+/* Import Icon Fonts */
+@import url('https://use.fontawesome.com/releases/v5.15.4/css/all.css');
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css');
+
+/* Import Library CSS */
+@import url('../../../../public/assets/customer/lib/lightbox/css/lightbox.min.css');
+@import url('../../../../public/assets/customer/lib/owlcarousel/assets/owl.carousel.min.css');
+
+/* Custom Styles */
+:root {
+    --primary-color: #0F172A;
+    --secondary-color: #64748B;
+    --accent-color: #F59E0B;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #F8FAFC;
+}
+
+/* Navbar Styles */
+.navbar-brand h1 {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 800;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: var(--primary-color) !important;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #1E293B 100%);
+    padding: 5rem 0;
+}
+
+/* Product Cards */
+.fruite-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.fruite-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.fruite-img {
+    height: 200px;
+    overflow: hidden;
+}
+
+.fruite-img img {
+    transition: transform 0.3s ease;
+}
+
+.fruite-item:hover .fruite-img img {
+    transform: scale(1.05);
+}
+
+.text-limited {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 40px;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #1E293B;
+    border-color: #1E293B;
+    transform: translateY(-2px);
+}
+
+/* Footer */
+.footer {
+    background-color: #0F172A !important;
+}
+
+.footer-item h4 {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600;
+}
+
+.footer-item a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-item a:hover {
+    color: var(--accent-color);
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.back-to-top:hover {
+    transform: translateY(-5px);
+}
+
+/* Spinner */
+#spinner {
+    z-index: 9999;
+}
+
+.spinner-grow {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 3rem 0;
+    }
+    
+    .fruite-img {
+        height: 150px;
+    }
+    
+    .back-to-top {
+        width: 40px;
+        height: 40px;
+        bottom: 20px;
+        right: 20px;
+    }
+}
