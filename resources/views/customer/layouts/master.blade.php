@@ -25,6 +25,9 @@
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
 
+    <!-- Vite JavaScript -->
+    @vite(['resources/assets/customer/js/app.js'])
+
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
