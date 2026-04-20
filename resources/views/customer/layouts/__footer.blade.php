@@ -4,7 +4,7 @@
         <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5);">
             <div class="row g-4">
                 <div class="col-lg-6">
-                    <a href="{{ route('home') }}">
+                    <a href="">
                         <h1 class="text-primary mb-0">DinePay</h1>
                         <p class="text-secondary mb-0">Delicious choices at your fingertips!</p>
                     </a>
@@ -54,7 +54,7 @@
         <div class="row">
             <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                 <span class="text-light">
-                    <a href="{{ route('home') }}"><i class="fas fa-copyright text-light me-2"></i>DinePay</a>
+                    <a href=""><i class="fas fa-copyright text-light me-2"></i>DinePay</a>
                     <span id="currentYear"></span>. All rights reserved.
                 </span>
             </div>
