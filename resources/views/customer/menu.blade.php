@@ -14,10 +14,10 @@
                                     <div class="col-md-6 col-lg-6 col-xl-4">
                                         <div class="rounded position-relative fruite-item">
                                             <div class="fruite-img">
-    <img src="https://loremflickr.com/400/400/{{ strtolower($item->category->cat_name) }}"
-         class="img-fluid w-100 rounded-top"
-         alt="{{ $item->item_name }}">
-</div>
+                                                <img src="https://loremflickr.com/400/400/{{ strtolower($item->category->cat_name) }}"
+                                                class="img-fluid w-100 rounded-top"
+                                                alt="{{ $item->name }}"></div>
+                                                
                                             <div class="text-white px-3 py-1 rounded position-absolute 
                                                  @if($item->category->cat_name == 'Food') bg-success
                                                 @elseif($item->category->cat_name == 'Drink') bg-info
@@ -26,7 +26,7 @@
                                                 {{ $item->category->cat_name }}</div>
 
                                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                <h4>{{$item->item_name}}</h4>
+                                                <h4>{{$item->name}}</h4>
                                                 <p class="text-limited">{{$item->description}}</p>
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
                                                     <p class="text-dark fs-5 fw-bold mb-0">
