@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->unsignedBigInteger('role_id');
+            $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
 
