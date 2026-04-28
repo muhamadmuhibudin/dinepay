@@ -14,12 +14,15 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-    ['cat_name' => 'Food', 'description' => 'Healthy and delicious meals'],
-    ['cat_name' => 'Drink', 'description' => 'Refreshing and tasty beverages'],
-    ['cat_name' => 'Snack', 'description' => 'Light and enjoyable snacks'],
-    ['cat_name' => 'Equipment', 'description' => 'Essential dining tools and utensils'],
+            ['cat_name' => 'Food', 'description' => 'Healthy and delicious meals'],
+            ['cat_name' => 'Drink', 'description' => 'Refreshing and tasty beverages'],
         ];
 
-        DB::table('categories')->insert($categories);
+        foreach ($categories as $category) {
+            DB::table('categories')->updateOrInsert(
+                ['cat_name' => $category['cat_name']], 
+                ['description' => $category['description']]
+            );
+        }
     }
 }
