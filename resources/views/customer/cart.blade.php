@@ -4,7 +4,16 @@
 <!-- Cart Page Start -->
 <div class="container-fluid py-5">
     <div class="container py-5">
-        <div class="table-responsive">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if(!empty($cart))
+        <h4 class="text-center">Your cart is empty !</h4>
+        @else
+         <div class="table-responsive">
             <table class="table">
                 <thead>
                   <tr>
@@ -17,6 +26,20 @@
                   </tr>
                 </thead>
                 <tbody>
+                    @php $subtotal = 0; @endphp
+                    @forelse($cart as $item)
+                    @php
+                        $itemTotal = $item('price') * $item('quantity');
+                        $subtotal += $itemTotal;
+                    @endphp
+
+                    <tr>
+                        <td>{{ $item['name'] }}</td>
+                        <td>Rp{{ number_format($item['price'], 0, ',', '.') }}</td>
+                        <td>{{ $item['qty'] }}</td>
+                        <td>Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
+                    </tr>
+                    
                     <tr>
                         <th scope="row">
                             <div class="d-flex align-items-center">
@@ -53,78 +76,11 @@
                             </button>
                         </td>
                     </tr>
+                    @empty
                     <tr>
-                        <th scope="row">
-                            <div class="d-flex align-items-center">
-                                <img src="https://images.unsplash.com/photo-1543392765-620e968d2162?q=80&w=1987&auto=format&fit=crop&ixlib=rb-4.0.3" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
-                            </div>
-                        </th>
-                        <td>
-                            <p class="mb-0 mt-4">Beef Burger</p>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">Rp40,000.00</p>
-                        </td>
-                        <td>
-                            <div class="input-group quantity mt-4" style="width: 100px;">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                                <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">Rp40,000.00</p>
-                        </td>
-                        <td>
-                            <button class="btn btn-md rounded-circle bg-light border mt-4">
-                                <i class="fa fa-times text-danger"></i>
-                            </button>
-                        </td>
+                        <td colspan="6" class="text-center">Cart is empty</td>
                     </tr>
-                    <tr>
-                        <th scope="row">
-                            <div class="d-flex align-items-center">
-                                <img src="https://images.unsplash.com/photo-1579954115545-a95591f28bfc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
-                            </div>
-                        </th>
-                        <td>
-                            <p class="mb-0 mt-4">Strawberry Smoothie</p>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">Rp20,000.00</p>
-                        </td>
-                        <td>
-                            <div class="input-group quantity mt-4" style="width: 100px;">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                                <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="mb-0 mt-4">Rp20,000.00</p>
-                        </td>
-                        <td>
-                            <button class="btn btn-md rounded-circle bg-light border mt-4">
-                                <i class="fa fa-times text-danger"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -157,6 +113,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </div>
 <!-- Cart Page End -->
