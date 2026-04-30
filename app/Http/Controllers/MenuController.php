@@ -12,7 +12,7 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         $tableNumber = $request->query('table');
-        if (!$tableNumber) {
+        if ($tableNumber) {
             Session::put('table_number', $tableNumber);
         }
 
@@ -23,7 +23,7 @@ class MenuController extends Controller
 
     public function cart()
     {
-        $cart = session::get('cart', []);
+        $cart = Session::get('cart', []);
         return view('customer.cart', compact('cart'));
     }
 
@@ -39,7 +39,7 @@ class MenuController extends Controller
             ], 404);
         }
 
-        $cart = session::get('cart', []);
+        $cart = Session::get('cart', []);
         if (isset($cart[$menuId])) {
             $cart[$menuId]['qty'] += 1;
         } else {
@@ -51,7 +51,7 @@ class MenuController extends Controller
                 'qty' => 1
             ];
         }
-        session::put('cart', $cart);
+        Session::put('cart', $cart);
         return response()->json([
             'status' => 'success',
             'message' => 'Item added to cart',
