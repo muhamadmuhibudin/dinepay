@@ -58,4 +58,25 @@ class MenuController extends Controller
             'cart' => $cart
         ]);
     }
+
+    public function updateCart(Request $request, $id)
+    {
+        $cart = Session::get('cart', []);
+        if (isset($cart[$id])) {
+            $qty = max(1, (int)$request->input('qty'));
+            $cart[$id]['qty'] = $qty;
+            Session::put('cart', $cart);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Cart updated']);
+    }
+
+    public function removeFromCart($id)
+    {
+        $cart = Session::get('cart', []);
+        if (isset($cart[$id])) {
+            unset($cart[$id]);
+            Session::put('cart', $cart);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Item removed']);
+    }
 }
