@@ -27,26 +27,37 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php $subtotal = 0; @endphp
-                        @foreach($cart as $item)
-                            @php
-                                $itemTotal = $item['price'] * $item['qty'];
-                                $subtotal += $itemTotal;
-                            @endphp
-                            <tr>
-                                <td>
-                                    <img src="{{ $item['image'] }}" class="img-fluid rounded-circle" style="width:80px; height:80px;" alt="{{ $item['name'] }}">
-                                </td>
-                                <td>{{ $item['name'] }}</td>
-                                <td>Rp{{ number_format($item['price'], 0, ',', '.') }}</td>
-                                <td>{{ $item['qty'] }}</td>
-                                <td>Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger">Remove</button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+    @php $subtotal = 0; @endphp
+    @foreach($cart as $item)
+        @php
+            $itemTotal = $item['price'] * $item['qty'];
+            $subtotal += $itemTotal;
+        @endphp
+        <tr>
+            <td>
+                <img src="{{ $item['image'] }}" class="img-fluid rounded-circle" style="width:80px; height:80px;" alt="{{ $item['name'] }}">
+            </td>
+            <td>{{ $item['name'] }}</td>
+            <td>Rp{{ number_format($item['price'], 0, ',', '.') }}</td>
+            <td>
+                <div class="input-group" style="width:120px;">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            onclick="updateCart({{ $item['id'] }}, {{ $item['qty'] - 1 }})">-</button>
+                    <input type="text" class="form-control form-control-sm text-center border-0"
+                           value="{{ $item['qty'] }}" readonly>
+                    <button class="btn btn-sm btn-outline-secondary"
+                            onclick="updateCart({{ $item['id'] }}, {{ $item['qty'] + 1 }})">+</button>
+                </div>
+            </td>
+            <td>Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
+            <td>
+                <button class="btn btn-sm btn-danger"
+                        onclick="removeFromCart({{ $item['id'] }})">Remove</button>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
+
                 </table>
             </div>
 
@@ -81,4 +92,35 @@
     </div>
 </div>
 <!-- Cart Page End -->
+
+<script>
+function updateCart(id, qty) {
+    fetch("{{ url('/cart/update') }}/" + id, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ qty: qty })
+    })
+    .then(res => res.json())
+    .then(data => {
+        location.reload(); // reload supaya qty & total terupdate
+    });
+}
+
+function removeFromCart(id) {
+    fetch("{{ url('/cart/remove') }}/" + id, {
+        method: "DELETE",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        location.reload();
+    });
+}
+</script>
+
 @endsection
