@@ -31,5 +31,4 @@ class Item extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
-
 }
