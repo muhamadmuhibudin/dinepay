@@ -60,23 +60,52 @@ class MenuController extends Controller
     }
 
     public function updateCart(Request $request, $id)
-    {
-        $cart = Session::get('cart', []);
-        if (isset($cart[$id])) {
-            $qty = max(1, (int)$request->input('qty'));
-            $cart[$id]['qty'] = $qty;
-            Session::put('cart', $cart);
-        }
-        return response()->json(['status' => 'success', 'message' => 'Cart updated']);
+{
+    $newQty = (int) $request->input('qty');
+
+    if ($newQty < 1) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Quantity must be at least 1'
+        ]);
     }
 
-    public function removeFromCart($id)
-    {
-        $cart = Session::get('cart', []);
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            Session::put('cart', $cart);
-        }
-        return response()->json(['status' => 'success', 'message' => 'Item removed']);
+    $cart = Session::get('cart', []);
+    if (isset($cart[$id])) {
+        $cart[$id]['qty'] = $newQty;
+        Session::put('cart', $cart);
+        Session::flash('success', 'Cart updated successfully');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart updated'
+        ]);
     }
+
+    return response()->json([
+        'success' => false,
+        'message' => 'Item not found in cart'
+    ]);
+}
+
+    public function removeFromCart($id)
+{
+    $cart = Session::get('cart', []);
+    if (isset($cart[$id])) {
+        unset($cart[$id]);
+        Session::put('cart', $cart);
+        Session::flash('success', 'Item removed from cart');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Item removed'
+        ]);
+    }
+
+    return response()->json([
+        'success' => false,
+        'message' => 'Item not found in cart'
+    ]);
+}
+
 }
