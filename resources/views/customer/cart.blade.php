@@ -37,7 +37,7 @@
                                     <img src="{{ $item['image'] }}" class="img-fluid rounded-circle" style="width:80px; height:80px;" alt="{{ $item['name'] }}">
                                 </td>
                                 <td>{{ $item['name'] }}</td>
-                                <td>Rp{{ number_format($item['price'], 0, ',', '.') }}</td>
+                                <td>${{ number_format($item['price'], 2, '.', ',') }}</td>
                                 <td>
                                     <div class="input-group" style="width:120px;">
                                         <button class="btn btn-sm btn-outline-secondary"
@@ -49,7 +49,7 @@
                                                 onclick="updateQuantity({{ $item['id'] }}, 1)">+</button>
                                     </div>
                                 </td>
-                                <td>Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
+                                <td>${{ number_format($itemTotal, 2, '.', ',') }}</td>
                                 <td>
                                     <button class="btn btn-sm btn-danger"
                                             onclick="if(confirm('Remove this item?')) removeFromCart({{ $item['id'] }})">Remove</button>
@@ -67,16 +67,16 @@
                             <h2 class="display-6 mb-4">Order <span class="fw-normal">Summary</span></h2>
                             <div class="d-flex justify-content-between mb-4">
                                 <h5 class="mb-0 me-4">Subtotal</h5>
-                                <p class="mb-0">Rp{{ number_format($subtotal, 0, ',', '.') }}</p>
+                                <p class="mb-0">${{ number_format($subtotal, 2, '.', ',') }}</p>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <p class="mb-0 me-4">Tax (10%)</p>
-                                <p class="mb-0">Rp{{ number_format($subtotal * 0.1, 0, ',', '.') }}</p>
+                                <p class="mb-0">${{ number_format($subtotal * 0.1, 2, '.', ',') }}</p>
                             </div>
                         </div>
                         <div class="py-4 mb-4 border-top d-flex justify-content-between">
                             <h4 class="mb-0 ps-4 me-4">Total</h4>
-                            <h5 class="mb-0 pe-4">Rp{{ number_format($subtotal * 1.1, 0, ',', '.') }}</h5>
+                            <h5 class="mb-0 pe-4">${{ number_format($subtotal * 1.1, 2, '.', ',') }}</h5>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end">
