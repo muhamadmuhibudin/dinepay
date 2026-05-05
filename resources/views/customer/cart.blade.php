@@ -1,7 +1,6 @@
 @extends('customer.layouts.master')
 
 @section('content')
-<!-- Cart Page Start -->
 <div class="container-fluid py-5">
     <div class="container py-5">
         @if(session('success'))
@@ -18,51 +17,50 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">Image</th>
-                            <th scope="col">Item</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Total</th>
-                            <th scope="col">Action</th>
+                            <th>Image</th>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-    @php $subtotal = 0; @endphp
-    @foreach($cart as $item)
-        @php
-            $itemTotal = $item['price'] * $item['qty'];
-            $subtotal += $itemTotal;
-        @endphp
-        <tr>
-            <td>
-                <img src="{{ $item['image'] }}" class="img-fluid rounded-circle" style="width:80px; height:80px;" alt="{{ $item['name'] }}">
-            </td>
-            <td>{{ $item['name'] }}</td>
-            <td>Rp{{ number_format($item['price'], 0, ',', '.') }}</td>
-            <td>
-                <div class="input-group" style="width:120px;">
-                    <button class="btn btn-sm btn-outline-secondary"
-                            onclick="updateCart({{ $item['id'] }}, {{ $item['qty'] - 1 }})">-</button>
-                    <input type="text" class="form-control form-control-sm text-center border-0"
-                           value="{{ $item['qty'] }}" readonly>
-                    <button class="btn btn-sm btn-outline-secondary"
-                            onclick="updateCart({{ $item['id'] }}, {{ $item['qty'] + 1 }})">+</button>
-                </div>
-            </td>
-            <td>Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
-            <td>
-                <button class="btn btn-sm btn-danger"
-                        onclick="removeFromCart({{ $item['id'] }})">Remove</button>
-            </td>
-        </tr>
-    @endforeach
-</tbody>
-
+                        @php $subtotal = 0; @endphp
+                        @foreach($cart as $item)
+                            @php
+                                $itemTotal = $item['price'] * $item['qty'];
+                                $subtotal += $itemTotal;
+                            @endphp
+                            <tr>
+                                <td>
+                                    <img src="{{ $item['image'] }}" class="img-fluid rounded-circle" style="width:80px; height:80px;" alt="{{ $item['name'] }}">
+                                </td>
+                                <td>{{ $item['name'] }}</td>
+                                <td>Rp{{ number_format($item['price'], 0, ',', '.') }}</td>
+                                <td>
+                                    <div class="input-group" style="width:120px;">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                onclick="updateQuantity({{ $item['id'] }}, -1)">-</button>
+                                        <input id="qty-{{ $item['id'] }}" type="text"
+                                               class="form-control form-control-sm text-center border-0 bg-transparent"
+                                               value="{{ $item['qty'] }}" readonly>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                onclick="updateQuantity({{ $item['id'] }}, 1)">+</button>
+                                    </div>
+                                </td>
+                                <td>Rp{{ number_format($itemTotal, 0, ',', '.') }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger"
+                                            onclick="if(confirm('Remove this item?')) removeFromCart({{ $item['id'] }})">Remove</button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
 
             <div class="row g-4 justify-content-end mt-1">
-                <div class="col-8"></div>
                 <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
                     <div class="bg-light rounded">
                         <div class="p-4">
@@ -82,35 +80,50 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-end">
-                        <div class="mb-0 mb-3">
-                            <a href="{{ route('checkout') }}" class="btn border-secondary py-3 text-primary text-uppercase mb-4" type="button">Proceed to Checkout</a>
-                        </div>
+                        <a href="{{ route('checkout') }}" class="btn border-secondary py-3 text-primary text-uppercase mb-4">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>
         @endif
     </div>
 </div>
-<!-- Cart Page End -->
+@endsection
 
+@section('scripts')
 <script>
-function updateCart(id, qty) {
-    fetch("{{ url('/cart/update') }}/" + id, {
+function updateQuantity(itemId, change) {
+    const qtyInput = document.getElementById('qty-' + itemId);
+    let currentQty = parseInt(qtyInput.value);
+    let newQty = currentQty + change;
+
+    if (newQty < 1) {
+        if (confirm('Remove this item?')) {
+            removeFromCart(itemId);
+        }
+        return;
+    }
+
+    fetch("{{ url('/cart/update') }}/" + itemId, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "X-CSRF-TOKEN": "{{ csrf_token() }}"
         },
-        body: JSON.stringify({ qty: qty })
+        body: JSON.stringify({ qty: newQty })
     })
     .then(res => res.json())
     .then(data => {
-        location.reload(); // reload supaya qty & total terupdate
+        if (data.success) {
+            qtyInput.value = newQty;
+            location.reload();
+        } else {
+            alert(data.message);
+        }
     });
 }
 
-function removeFromCart(id) {
-    fetch("{{ url('/cart/remove') }}/" + id, {
+function removeFromCart(itemId) {
+    fetch("{{ url('/cart/remove') }}/" + itemId, {
         method: "DELETE",
         headers: {
             "X-CSRF-TOKEN": "{{ csrf_token() }}"
@@ -118,9 +131,12 @@ function removeFromCart(id) {
     })
     .then(res => res.json())
     .then(data => {
-        location.reload();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
     });
 }
 </script>
-
 @endsection
