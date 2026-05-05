@@ -31,5 +31,6 @@
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
+    @yield('scripts')
 </body>
 </html>
