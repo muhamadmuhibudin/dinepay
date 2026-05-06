@@ -1,33 +1,38 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MenuController;
 
+// Default route → Home page
 Route::get('/', function () {
-    return view('welcome');
+    return view('customer.home');
 })->name('home');
+
+// Menu routes
+Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 
 // Customer routes
 Route::prefix('customer')->group(function () {
     Route::get('/welcome', function () {
-        return view('customer.layout.welcome');
+        return view('customer.welcome');
     })->name('customer.welcome');
 
-    Route::get('/master', function () {
-        return view('customer.layout.master');
-    })->name('customer.master');
+    Route::get('/checkout', function () {
+        return view('customer.checkout');
+    })->name('checkout');
+
+    Route::get('/home', function () {
+        return view('customer.home');
+    })->name('customer.home');
 });
 
-// Menu route
-Route::get('/menu', function () {
-    return view('customer.layout.menu'); 
-})->name('menu.index');
+// Cart routes
+Route::get('/cart', [MenuController::class,'cart'])->name('cart.index');
+Route::post('/cart/add', [MenuController::class,'addToCart'])->name('cart.add');
+Route::post('/cart/update/{id}', [MenuController::class, 'updateCart'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [MenuController::class, 'removeFromCart'])->name('cart.remove');
 
-// Contact route
+// Contact route (if contact.blade.php exists in customer folder)
 Route::get('/contact', function () {
-    return view('customer.layout.contact'); 
+    return view('customer.contact'); 
 })->name('contact');
-
-// Cart route
-Route::get('/cart', function () {
-    return view('customer.layout.cart'); 
-})->name('cart.index');
