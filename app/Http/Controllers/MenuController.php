@@ -21,6 +21,8 @@ class MenuController extends Controller
         return view('customer.menu', compact('tableNumber', 'items'));
     }
 
+    // Cart
+
     public function cart()
     {
         $cart = Session::get('cart', []);
@@ -48,7 +50,8 @@ class MenuController extends Controller
                 'name' => $menu->name,
                 'price' => $menu->price,
                 'image' => $menu->img,
-                'qty' => 1
+                'qty' => 1,
+                'category' => $menu->category->cat_name,
             ];
         }
         Session::put('cart', $cart);
