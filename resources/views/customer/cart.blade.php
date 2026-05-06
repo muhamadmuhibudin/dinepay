@@ -1,5 +1,6 @@
 @extends('customer.layouts.master')
 
+
 @section('content')
 <div class="container-fluid py-5">
     <div class="container py-5">
@@ -34,8 +35,12 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <img src="{{ $item['image'] }}" class="img-fluid rounded-circle" style="width:80px; height:80px;" alt="{{ $item['name'] }}">
-                                </td>
+    <img src="https://loremflickr.com/80/80/{{ isset($item['category']) && !empty($item['category']) ? strtolower($item['category']) : 'food' }}"
+         class="img-fluid rounded-circle"
+         style="width:80px; height:80px;"
+         alt="{{ $item['name'] }}">
+</td>
+
                                 <td>{{ $item['name'] }}</td>
                                 <td>${{ number_format($item['price'], 2, '.', ',') }}</td>
                                 <td>
