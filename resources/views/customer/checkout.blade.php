@@ -1,5 +1,8 @@
 @extends('customer.layouts.master')
 
+@section('page_title', 'Checkout')
+@section('page_subtitle', 'Review and complete your order details')
+
 @section('content')
 
 <!-- Checkout Page Start -->
