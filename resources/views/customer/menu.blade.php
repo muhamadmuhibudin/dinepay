@@ -1,5 +1,8 @@
 @extends('customer.layouts.master')
 
+@section('page_title', 'Our Menu')
+@section('page_subtitle', 'Please choose your favorite menu')
+
 @section('content')
 <!-- Fruits Shop Start-->
         <div class="container-fluid fruite py-5">
