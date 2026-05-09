@@ -1,5 +1,7 @@
 @extends('customer.layouts.master')
 
+@section('page_title', 'Your Cart')
+@section('page_subtitle', 'Review and manage your selected items')
 
 @section('content')
 <div class="container-fluid py-5">
