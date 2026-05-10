@@ -111,4 +111,17 @@ class MenuController extends Controller
     ]);
 }
 
+// checkout
+public function checkout()
+{
+    $cart = Session::get('cart', []);
+    if(empty($cart)) {
+        return redirect()->route('cart.index')->with('error', 'Cart is empty');
+    }
+
+    $tableNumber = Session::get('tableNumber');
+
+    return view('customer.checkout', compact('cart', 'tableNumber'));
+}
+
 }
