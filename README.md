@@ -1,59 +1,241 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DinePay
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+DinePay is a modern restaurant ordering and payment system built with Laravel 12.  
+This project is designed to simplify restaurant operations through QR-based ordering, digital payments, and role-based management dashboards.
 
-## About Laravel
+The application allows customers to browse menus, add items to cart, place orders, and complete payments seamlessly.  
+On the management side, admins, cashiers, and chefs each have their own workflow and dashboard access.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project is currently under active development as part of a fullstack portfolio focused on real-world restaurant digitalization.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+### Customer Features
+- Browse restaurant menu
+- View menu categories
+- Add items to cart
+- Update cart quantity dynamically
+- Remove items from cart
+- Checkout page with order summary
+- Session-based cart management
+- Responsive customer interface
+- USD currency formatting for international readiness
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Payment Features
+- Cash payment workflow
+- QRIS payment integration (Midtrans)
+- Payment status handling
+- Order confirmation flow
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Admin Features
+- Dashboard management
+- Menu management
+- Category management
+- Order management
+- Employee management
+- Role & permission management
 
-## Laravel Sponsors
+### Cashier Features
+- Confirm cash payments
+- Monitor incoming orders
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Chef Features
+- Update cooking status
+- Manage kitchen order flow
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Tech Stack
+
+### Backend
+- Laravel 12
+- PHP 8.2
+- MySQL
+
+### Frontend
+- Blade Template Engine
+- Bootstrap 5
+- TailwindCSS
+- Vite
+- JavaScript
+
+### Additional Tools
+- Midtrans Payment Gateway
+- Laravel Breeze
+- Session-based Cart System
+
+---
+
+## Project Status
+
+The project is currently in active development.
+
+Current progress includes:
+- Customer menu flow
+- Cart system
+- Dynamic quantity update
+- Checkout page
+- Session handling improvements
+- Responsive UI adjustments
+
+Upcoming features:
+- Midtrans QRIS integration
+- Admin dashboard
+- Authentication & authorization
+- Role-based access control
+- Analytics dashboard
+- Deployment optimization
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/muhamadmuhibudin/dinepay.git
+```
+
+Move into the project directory:
+
+```bash
+cd dinepay
+```
+
+Install dependencies:
+
+```bash
+composer install
+npm install
+```
+
+Copy environment file:
+
+```bash
+cp .env.example .env
+```
+
+Generate application key:
+
+```bash
+php artisan key:generate
+```
+
+Configure your database inside `.env`
+
+```env
+DB_DATABASE=dinepayapp
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Run migrations and seeders:
+
+```bash
+php artisan migrate --seed
+```
+
+Start the development server:
+
+```bash
+composer run dev
+```
+
+---
+
+## Folder Structure
+
+```bash
+app/
+├── Http/
+├── Models/
+├── Providers/
+
+database/
+├── factories/
+├── migrations/
+├── seeders/
+
+resources/
+├── assets/
+├── views/
+
+routes/
+├── web.php
+```
+
+---
+
+## Architecture Goals
+
+This project is being developed with a production-oriented mindset.
+
+Main focus areas:
+- Clean and maintainable code
+- Scalable project structure
+- Separation of concerns
+- Reusable UI components
+- Real-world payment workflow
+- Role-based authorization
+- Developer-friendly architecture
+
+---
+
+## Screenshots
+
+Screenshots will be added as the project progresses.
+
+Planned previews:
+- Customer menu page
+- Cart page
+- Checkout page
+- Admin dashboard
+- Cashier dashboard
+- Chef dashboard
+
+---
+
+## Learning Goals
+
+This project is part of my journey to improve as a fullstack Laravel developer by building a real-world restaurant management system.
+
+Main learning focus:
+- Laravel application architecture
+- Payment gateway integration
+- Role & permission management
+- Fullstack workflow
+- Backend & frontend integration
+- Deployment preparation
+- Production-ready development practices
+
+---
+
+## Roadmap
+
+- [x] Menu listing
+- [x] Cart management
+- [x] Checkout page
+- [ ] Midtrans QRIS integration
+- [ ] Authentication system
+- [ ] Role-based dashboards
+- [ ] Order tracking
+- [ ] Reporting dashboard
+- [ ] API integration
+- [ ] Deployment
+- [ ] Automated testing
+
+---
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+This project is currently maintained as a personal portfolio and learning project.
 
-## Code of Conduct
+Suggestions, feedback, and discussions are always welcome.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced under the MIT License.
