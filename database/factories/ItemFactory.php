@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Item;
+use App\Models\Category;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Item>
@@ -19,11 +20,11 @@ class ItemFactory extends Factory
     {
         return [
             'name' => $this->faker->sentence(2),
-            'category_id' => $this->faker->numberBetween(1,4),
+            'category_id' => Category::inRandomOrder()->value('id'),
             'price' => $this->faker->randomFloat(2, 10, 200),
             'description' => $this->faker->sentence(),
             'img' => $this->faker->imageUrl(),
-            'is_active' => $this->faker->boolean(),
+            'is_active' => true,
         ];
     }
 }
