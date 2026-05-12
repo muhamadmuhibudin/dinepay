@@ -49,9 +49,11 @@
                                     <div class="input-group" style="width:120px;">
                                         <button class="btn btn-sm btn-outline-secondary"
                                                 onclick="updateQuantity({{ $item['id'] }}, -1)">-</button>
-                                        <input id="qty-{{ $item['id'] }}" type="text"
-                                               class="form-control form-control-sm text-center border-0 bg-transparent"
-                                               value="{{ $item['qty'] }}" readonly>
+                                        <input id="qty-{{ $item['id'] }}"
+                                               type="number"
+                                               class="form-control form-control-sm text-center"
+                                               value="{{ $item['qty'] }}"
+                                               readonly>
                                         <button class="btn btn-sm btn-outline-secondary"
                                                 onclick="updateQuantity({{ $item['id'] }}, 1)">+</button>
                                     </div>
@@ -122,7 +124,7 @@ function updateQuantity(itemId, change) {
     .then(data => {
         if (data.success) {
             qtyInput.value = newQty;
-            location.reload();
+            window.location.reload();
         } else {
             alert(data.message);
         }
@@ -139,7 +141,7 @@ function removeFromCart(itemId) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            window.location.reload();
         } else {
             alert(data.message);
         }
