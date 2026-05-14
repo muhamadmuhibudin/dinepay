@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Models\Item;
-use App\Models\Category;
-use App\Models\Order;
-use App\Models\User;
-use App\Models\OrderItem;
+use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
 {
     public function index(Request $request)
     {
         $tableNumber = $request->query('table');
-        if (!empty($tableNumber)) {
+        if (! empty($tableNumber)) {
             Session::put('tableNumber', $tableNumber);
         }
         $items = Item::where('is_active', 1)->orderBy('name', 'asc')->get();
@@ -30,6 +31,7 @@ class MenuController extends Controller
     public function cart()
     {
         $cart = Session::get('cart', []);
+
         return view('customer.cart', compact('cart'));
     }
 
@@ -38,10 +40,10 @@ class MenuController extends Controller
         $menuId = $request->input('id');
         $menu = Item::find($menuId);
 
-        if (!$menu) {
+        if (! $menu) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Menu not found'
+                'message' => 'Menu not found',
             ], 404);
         }
 
@@ -59,151 +61,149 @@ class MenuController extends Controller
             ];
         }
         Session::put('cart', $cart);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Item added to cart',
-            'cart' => $cart
+            'cart' => $cart,
         ]);
     }
 
     public function updateCart(Request $request, $id)
-{
-    $newQty = (int) $request->input('qty');
+    {
+        $newQty = (int) $request->input('qty');
 
-    if ($newQty < 1) {
+        if ($newQty < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Quantity must be at least 1',
+            ]);
+        }
+
+        $cart = Session::get('cart', []);
+        if (isset($cart[$id])) {
+            $cart[$id]['qty'] = $newQty;
+            Session::put('cart', $cart);
+            Session::flash('success', 'Cart updated successfully');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated',
+            ]);
+        }
+
         return response()->json([
             'success' => false,
-            'message' => 'Quantity must be at least 1'
+            'message' => 'Item not found in cart',
         ]);
     }
-
-    $cart = Session::get('cart', []);
-    if (isset($cart[$id])) {
-        $cart[$id]['qty'] = $newQty;
-        Session::put('cart', $cart);
-        Session::flash('success', 'Cart updated successfully');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cart updated'
-        ]);
-    }
-
-    return response()->json([
-        'success' => false,
-        'message' => 'Item not found in cart'
-    ]);
-}
 
     public function removeFromCart($id)
-{
-    $cart = Session::get('cart', []);
-    if (isset($cart[$id])) {
-        unset($cart[$id]);
-        Session::put('cart', $cart);
-        Session::flash('success', 'Item removed from cart');
+    {
+        $cart = Session::get('cart', []);
+        if (isset($cart[$id])) {
+            unset($cart[$id]);
+            Session::put('cart', $cart);
+            Session::flash('success', 'Item removed from cart');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed',
+            ]);
+        }
 
         return response()->json([
-            'success' => true,
-            'message' => 'Item removed'
+            'success' => false,
+            'message' => 'Item not found in cart',
         ]);
     }
 
-    return response()->json([
-        'success' => false,
-        'message' => 'Item not found in cart'
-    ]);
-}
+    // checkout
+    public function checkout()
+    {
+        // dd(Session::all());
+        $cart = Session::get('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Cart is empty');
+        }
 
-// checkout
-public function checkout()
-{
-    // dd(Session::all());
-    $cart = Session::get('cart', []);
-    if(empty($cart)) {
-        return redirect()->route('cart.index')->with('error', 'Cart is empty');
+        $tableNumber = Session::get('tableNumber');
+
+        return view('customer.checkout', compact('cart', 'tableNumber'));
     }
 
-    $tableNumber = Session::get('tableNumber');
+    public function storeOrder(Request $request)
+    {
+        $cart = Session::get('cart', []);
+        $tableNumber = (int) Session::get('tableNumber', 1);
 
-    return view('customer.checkout', compact('cart', 'tableNumber'));
-}
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Cart is empty');
+        }
 
-public function storeOrder(Request $request)
-{
-    $cart = Session::get('cart', []);
-    $tableNumber = Session::get('tableNumber');
-    
-    if(empty($cart)) {
-        return redirect()->route('cart.index')->with('error', 'Cart is empty');
+        $validator = Validator::make($request->all(), [
+            'fullname' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'payment_method' => ['required', Rule::in(Order::paymentMethods())],
+            'note' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->with('error', $validator->errors()->first());
+        }
+
+        $validated = $validator->validated();
+        $subtotal = 0;
+        foreach ($cart as $item) {
+            $subtotal += $item['price'] * $item['qty'];
+        }
+
+        $tax = (int) round($subtotal * 0.1);
+        $grandTotal = $subtotal + $tax;
+
+        DB::transaction(function () use ($cart, $grandTotal, $subtotal, $tableNumber, $tax, $validated) {
+            $user = User::firstOrCreate(
+                [
+                    'phone' => $validated['phone'],
+                ],
+                [
+                    'username' => Str::slug($validated['fullname'].rand(100, 999)),
+                    'fullname' => $validated['fullname'],
+                    'role_id' => 4,
+                ]
+            );
+
+            $order = Order::create([
+                'order_code' => 'ORD-'.$tableNumber.'-'.time().'-'.$user->id,
+                'user_id' => $user->id,
+                'subtotal' => $subtotal,
+                'tax' => $tax,
+                'grand_total' => $grandTotal,
+                'status' => Order::STATUS_PENDING,
+                'table_number' => $tableNumber,
+                'payment_method' => $validated['payment_method'],
+                'payment_status' => Order::PAYMENT_STATUS_PENDING,
+                'note' => $validated['note'] ?? null,
+            ]);
+
+            foreach ($cart as $itemId => $item) {
+                $lineSubtotal = $item['price'] * $item['qty'];
+                $lineTax = (int) round($lineSubtotal * 0.1);
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'item_id' => $itemId,
+                    'quantity' => $item['qty'],
+                    'price' => $lineSubtotal,
+                    'tax' => $lineTax,
+                    'total_price' => $lineSubtotal + $lineTax,
+                ]);
+            }
+        });
+
+        Session::forget('cart');
+
+        return redirect()->route('menu.index')->with('success', 'Order placed successfully');
     }
-
-    $validator = Validator::make($request->all(), [
-        'fullname' => 'required|string|max:255',
-        'phone' => 'required|string|max:15',
-    ]);
-    
-    if($validator->fails()) {
-       return redirect()->back()
-       ->with('error', $validator->errors()->first());
-    }
-    
-    $total = 0;
-    foreach($cart as $item) {
-        $total += $item['price'] * $item['qty'];
-    }
-
- 
-
-    $totalAmount = 0;
-    foreach($cart as $item) {
-        $totalAmount += $item['price'] * $item['qty'];
-    }
-    $itemDetails[] = [
-        'id' => $item['id'],
-        'name' => substr($item['name'],0,50),
-        'price' => $item['price'] + $item['price'] * 0.1,
-        'qty' => $item['qty']
-    ];
-
-   $user = User::firstOrCreate(
-    [
-        'phone' => $request->phone,
-    ],
-    [
-        'username' => Str::slug($request->fullname . rand(100,999)),
-        'fullname' => $request->fullname,
-        'role_id' => 4,
-    ]
-);
-
-    $order = Order::create([
-        'order_code' => 'ORD-' .$tableNumber. '-' . time(). '-' . $user->id,
-        'user_id' => $user->id,
-        'subtotal' => $totalAmount,
-        'tax' => $totalAmount * 0.1,
-        'grand_total' => $totalAmount + ($totalAmount * 0.1),
-        'status' => 'pending',
-        'table_number' => $tableNumber,
-        'total_amount' => $totalAmount,
-        'payment_method' => $request->payment_method,
-        'note' => $request->note,
-    ]);
-
-    foreach ($cart as $itemId => $item) {
-    OrderItem::create([
-        'order_id' => $order->id,
-        'item_id' => $itemId,
-        'quantity' => $item['qty'],
-        'price' => $item['price'] * $item['qty'],
-        'tax' => 0.1 * $item['price'] * $item['qty'],
-        'total_price' => $item['price'] * $item['qty'] + (0.1 * $item['price'] * $item['qty']),
-    ]);
-    }
-
-    Session::forget('cart');
-    
-    return redirect()->route('menu.index')->with('success', 'Order placed successfully');
-}
-
 }
