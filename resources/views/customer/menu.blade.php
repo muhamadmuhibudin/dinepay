@@ -34,7 +34,10 @@
                                                 <div class="d-flex justify-content-between flex-lg-wrap">
                                                     <p class="text-dark fs-5 fw-bold mb-0">
                                                     {{ '$' . number_format($item->price, 0, ',', '.') }}</p>
-                                                    <a href="#" onclick="addToCart({{$item->id}})" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to Cart</a>
+                                                    <button type="button" onclick="addToCart({{$item->id}})" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i>
+                                                        Add to Cart
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
