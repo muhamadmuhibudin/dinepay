@@ -16,10 +16,9 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         $tableNumber = $request->query('table');
-        if ($tableNumber) {
+        if (!empty($tableNumber)) {
             Session::put('tableNumber', $tableNumber);
         }
-
         $items = Item::where('is_active', 1)->orderBy('name', 'asc')->get();
 
         return view('customer.menu', compact('tableNumber', 'items'));
