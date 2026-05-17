@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('grand_total');
             $table->enum('status', ['pending', 'settlement', 'cooked', 'cancelled'])->default('pending');
             $table->integer('table_number');
-            $table->enum('payment_method', ['cash', 'card', 'online', 'QR'])->default('cash');
+            $table->enum('payment_method', ['cash', 'qris'])->default('qris');
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
             $table->text('note')->nullable();
             $table->softDeletes();
