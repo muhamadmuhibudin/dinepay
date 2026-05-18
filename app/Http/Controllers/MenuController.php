@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Item;
 use App\Models\Category;
 use App\Models\Order;
@@ -117,6 +118,7 @@ class MenuController extends Controller
 // checkout
 public function checkout()
 {
+    // dd(Session::all());
     $cart = Session::get('cart', []);
     if(empty($cart)) {
         return redirect()->route('cart.index')->with('error', 'Cart is empty');
@@ -142,7 +144,8 @@ public function storeOrder(Request $request)
     ]);
     
     if($validator->fails()) {
-        return redirect()->back()->route('checkout')->with('error', $validator->errors()->first());
+       return redirect()->back()
+       ->with('error', $validator->errors()->first());
     }
     
     $total = 0;
@@ -150,20 +153,7 @@ public function storeOrder(Request $request)
         $total += $item['price'] * $item['qty'];
     }
 
-    $order = new Order();
-    $order->table_number = $tableNumber;
-    $order->total = $total;
-    $order->status = 'pending';
-    $order->save();
-
-    foreach($cart as $item) {
-        $orderItem = new OrderItem();
-        $orderItem->order_id = $order->id;
-        $orderItem->menu_id = $item['id'];
-        $orderItem->quantity = $item['qty'];
-        $orderItem->price = $item['price'];
-        $orderItem->save();
-    }
+ 
 
     $totalAmount = 0;
     foreach($cart as $item) {
@@ -172,27 +162,32 @@ public function storeOrder(Request $request)
     $itemDetails[] = [
         'id' => $item['id'],
         'name' => substr($item['name'],0,50),
-        'price' => $item['price'] + $item('price') * 0.1,
+        'price' => $item['price'] + $item['price'] * 0.1,
         'qty' => $item['qty']
     ];
 
-    $user = User::firstOrCreate ([
-        'name' => $request->fullname,
+   $user = User::firstOrCreate(
+    [
         'phone' => $request->phone,
-        'role_id' => 4
-    ]);
+    ],
+    [
+        'username' => Str::slug($request->fullname . rand(100,999)),
+        'fullname' => $request->fullname,
+        'role_id' => 4,
+    ]
+);
 
     $order = Order::create([
         'order_code' => 'ORD-' .$tableNumber. '-' . time(). '-' . $user->id,
         'user_id' => $user->id,
         'subtotal' => $totalAmount,
         'tax' => $totalAmount * 0.1,
-        'grand_total' => $totalAmount * (0.1 * $totalAmount),
+        'grand_total' => $totalAmount + ($totalAmount * 0.1),
         'status' => 'pending',
         'table_number' => $tableNumber,
         'total_amount' => $totalAmount,
         'payment_method' => $request->payment_method,
-        'notes' => $request->notes,
+        'note' => $request->note,
     ]);
 
     foreach ($cart as $itemId => $item) {
@@ -204,12 +199,11 @@ public function storeOrder(Request $request)
         'tax' => 0.1 * $item['price'] * $item['qty'],
         'total_price' => $item['price'] * $item['qty'] + (0.1 * $item['price'] * $item['qty']),
     ]);
-
     }
 
     Session::forget('cart');
     
-    return redirect()->route('menu')->with('success', 'Order placed successfully');
+    return redirect()->route('menu.index')->with('success', 'Order placed successfully');
 }
 
 }
