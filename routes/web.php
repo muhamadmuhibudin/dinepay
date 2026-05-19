@@ -17,10 +17,6 @@ Route::prefix('customer')->group(function () {
         return view('customer.welcome');
     })->name('customer.welcome');
 
-    Route::get('/checkout', function () {
-        return view('customer.checkout');
-    })->name('checkout');
-
     Route::get('/home', function () {
         return view('customer.home');
     })->name('customer.home');
@@ -31,6 +27,10 @@ Route::get('/cart', [MenuController::class,'cart'])->name('cart.index');
 Route::post('/cart/add', [MenuController::class,'addToCart'])->name('cart.add');
 Route::post('/cart/update/{id}', [MenuController::class, 'updateCart'])->name('cart.update');
 Route::delete('/cart/remove/{id}', [MenuController::class, 'removeFromCart'])->name('cart.remove');
+
+// Checkout routes
+Route::get('/checkout', [MenuController::class, 'checkout'])->name('checkout');
+Route::post('/checkout/store', [MenuController::class, 'storeOrder'])->name('checkout.store');
 
 // Contact route (if contact.blade.php exists in customer folder)
 Route::get('/contact', function () {
