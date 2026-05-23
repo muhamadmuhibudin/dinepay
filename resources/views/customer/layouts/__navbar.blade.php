@@ -10,9 +10,8 @@
             </button>
             <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
-                    <a href="/" class="nav-item nav-link {{ Request::is('/') ? 'active' : '' }}">Home</a>
+                    <a href="{{ route('home') }}" class="nav-item nav-link {{ Request::is('/') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('menu.index') }}" class="nav-item nav-link {{ Request::is('menu*') ? 'active' : '' }}">Menu</a>
-                    <a href="{{ route('contact') }}" class="nav-item nav-link {{ Request::is('contact') ? 'active' : '' }}">Contact</a>
                 </div>
                 <div class="d-flex m-3 me-0">
                     <a href="{{ route('cart.index') }}" class="position-relative me-4 my-auto">
