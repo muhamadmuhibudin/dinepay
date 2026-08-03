@@ -29,9 +29,9 @@
             <div class="col-lg-4 col-md-6">
                 <div class="footer-item">
                     <h4 class="text-light mb-3">Contact Us</h4>
-                    <p>Address: Jl. Sangkuriang No.8, Cimahi Tengah, Cimahi City, West Java 40526</p>
+                    <p>Address: NYSE Exchange, New York</p>
                     <p>Email: info@dinepay.com</p>
-                    <p>Phone: +62 899-9488-990</p>
+                    <p>Phone: +62 xxx-xxxx-xxx</p>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
