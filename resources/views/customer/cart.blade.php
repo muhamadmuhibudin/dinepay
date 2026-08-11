@@ -37,11 +37,11 @@
                             @endphp
                             <tr>
                                 <td>
-    <img src="https://loremflickr.com/80/80/{{ isset($item['category']) && !empty($item['category']) ? strtolower($item['category']) : 'food' }}"
-         class="img-fluid rounded-circle"
-         style="width:80px; height:80px;"
-         alt="{{ $item['name'] }}">
-</td>
+                                    <img src="{{ isset($item['img']) && $item['img'] ? (str_starts_with($item['img'], 'http') ? $item['img'] : asset('img_item_upload/' . $item['img'])) : asset('assets/admin/static/images/samples/error-404.svg') }}"
+                                                    class="img-fluid rounded-circle"
+                                                    style="width:48px; height:48px; object-fit: cover;"
+                                                    alt="{{ $item['name'] }}">
+                                </td>
 
                                 <td>{{ $item['name'] }}</td>
                                 <td>${{ number_format($item['price'], 2, '.', ',') }}</td>
