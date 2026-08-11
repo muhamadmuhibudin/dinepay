@@ -55,24 +55,45 @@
             </div>
         </div>
         <!-- Fruits Shop End-->
-         <script>
-    function addToCart(menuId) {
-        fetch("{{ route('cart.add') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ id: menuId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-        })
-        .catch(error => {
-            console.error("Error:", error);
+@push('scripts')
+<script>
+function addToCart(menuId) {
+    fetch("{{ route('cart.add') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ id: menuId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Display SweetAlert toast for successful addition
+        Swal.fire({
+            title: 'Success!',
+            text: data.message,
+            icon: 'success',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true
         });
-    }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        // Display SweetAlert toast for error handling
+        Swal.fire({
+            title: 'Error!',
+            text: 'A system error occurred. Please try again.',
+            icon: 'error',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    });
+}
 </script>
-
+@endpush
 @endsection
