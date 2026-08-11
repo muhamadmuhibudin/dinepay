@@ -60,8 +60,7 @@
                                 </td>
                                 <td>${{ number_format($itemTotal, 2, '.', ',') }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-danger"
-                                            onclick="if(confirm('Remove this item?')) removeFromCart({{ $item['id'] }})">Remove</button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmRemove({{ $item['id'] }})">Remove</button>
                                 </td>
                             </tr>
                         @endforeach
@@ -98,7 +97,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 function updateQuantity(itemId, change) {
     const qtyInput = document.getElementById('qty-' + itemId);
@@ -106,9 +105,8 @@ function updateQuantity(itemId, change) {
     let newQty = currentQty + change;
 
     if (newQty < 1) {
-        if (confirm('Remove this item?')) {
-            removeFromCart(itemId);
-        }
+        // Trigger SweetAlert confirmation when quantity drops below 1
+        confirmRemove(itemId);
         return;
     }
 
@@ -126,7 +124,32 @@ function updateQuantity(itemId, change) {
             qtyInput.value = newQty;
             window.location.reload();
         } else {
-            alert(data.message);
+            Swal.fire({
+                title: 'Error!',
+                text: data.message,
+                icon: 'error',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    });
+}
+
+function confirmRemove(itemId) {
+    // SweetAlert2 confirmation modal with Yes/No buttons
+    Swal.fire({
+        title: 'Remove this item?',
+        text: "You can always add it back to your cart later.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            removeFromCart(itemId);
         }
     });
 }
@@ -143,9 +166,17 @@ function removeFromCart(itemId) {
         if (data.success) {
             window.location.reload();
         } else {
-            alert(data.message);
+            Swal.fire({
+                title: 'Error!',
+                text: data.message,
+                icon: 'error',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
         }
     });
 }
 </script>
-@endsection
+@endpush
