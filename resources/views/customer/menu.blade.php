@@ -17,9 +17,11 @@
                                     <div class="col-md-6 col-lg-6 col-xl-4">
                                         <div class="rounded position-relative fruite-item">
                                             <div class="fruite-img">
-                                                <img src="https://loremflickr.com/400/400/{{ strtolower($item->category->cat_name) }}"
-                                                class="img-fluid w-100 rounded-top"
-                                                alt="{{ $item->name }}"></div>
+                                                <img src="{{ $item->img ? (str_starts_with($item->img, 'http') ? $item->img : asset('img_item_upload/' . $item->img)) : asset('assets/admin/static/images/samples/error-404.svg') }}"
+                                                    class="img-fluid w-100 rounded-top"
+                                                    style="height: 250px; object-fit: cover;"
+                                                    alt="{{ $item->name }}">
+                                            </div>
                                                 
                                             <div class="text-white px-3 py-1 rounded position-absolute 
                                                  @if($item->category->cat_name == 'Food') bg-success
