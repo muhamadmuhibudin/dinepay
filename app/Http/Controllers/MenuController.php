@@ -162,7 +162,7 @@ class MenuController extends Controller
         $tax = (int) round($subtotal * 0.1);
         $grandTotal = $subtotal + $tax;
 
-        DB::transaction(function () use ($cart, $grandTotal, $subtotal, $tableNumber, $tax, $validated) {
+        $order = DB::transaction(function () use ($cart, $grandTotal, $subtotal, $tableNumber, $tax, $validated) {
             $user = User::firstOrCreate(
                 [
                     'phone' => $validated['phone'],
@@ -199,11 +199,43 @@ class MenuController extends Controller
                     'tax' => $lineTax,
                     'total_price' => $lineSubtotal + $lineTax,
                 ]);
-            }
+            } return $order;
         });
 
         Session::forget('cart');
 
-        return redirect()->route('menu.index')->with('success', 'Order placed successfully');
+        return redirect()->route('checkout.success', [
+            'orderId' => $order->order_code
+        ]);
     }
+
+    public function checkoutSuccess($orderId)
+    {
+        dd($orderId);
+    $order = Order::where('order_code', $orderId)->first();
+
+    if (! $order) {
+        return redirect()
+            ->route('menu.index')
+            ->with('error', 'Order not found');
+    }
+
+    $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+    if ($order->payment_method === Order::PAYMENT_METHOD_QRIS) {
+
+        $order->update([
+            'status' => Order::STATUS_SETTLEMENT,
+        ]);
+
+        return redirect()->route('menu.qris', [
+            'orderId' => $order->order_code
+        ]);
+    }
+
+    return view('customer.success', compact(
+        'order',
+        'orderItems'
+    ));
+}
 }
