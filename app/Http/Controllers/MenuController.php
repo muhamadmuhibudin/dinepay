@@ -26,8 +26,6 @@ class MenuController extends Controller
         return view('customer.menu', compact('tableNumber', 'items'));
     }
 
-    // Cart
-
     public function cart()
     {
         $cart = Session::get('cart', []);
@@ -118,10 +116,8 @@ class MenuController extends Controller
         ]);
     }
 
-    // checkout
     public function checkout()
     {
-        // dd(Session::all());
         $cart = Session::get('cart', []);
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Cart is empty');
@@ -138,7 +134,7 @@ class MenuController extends Controller
         $tableNumber = (int) Session::get('tableNumber', 1);
 
         if (empty($cart)) {
-            return redirect()->route('cart.index')->with('error', 'Cart is empty');
+            return response()->json(['message' => 'Cart is empty'], 400);
         }
 
         $validator = Validator::make($request->all(), [
@@ -149,8 +145,7 @@ class MenuController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->with('error', $validator->errors()->first());
+            return response()->json(['message' => $validator->errors()->first()], 422);
         }
 
         $validated = $validator->validated();
@@ -168,74 +163,125 @@ class MenuController extends Controller
                     'phone' => $validated['phone'],
                 ],
                 [
-                    'username' => Str::slug($validated['fullname'].rand(100, 999)),
+                    'username' => Str::slug($validated['fullname'] . rand(100, 999)),
                     'fullname' => $validated['fullname'],
                     'role_id' => 4,
                 ]
             );
 
             $order = Order::create([
-                'order_code' => 'ORD-'.$tableNumber.'-'.time().'-'.$user->id,
+                'order_code' => 'ORD-' . $tableNumber . '-' . time() . '-' . $user->id,
                 'user_id' => $user->id,
                 'subtotal' => $subtotal,
                 'tax' => $tax,
                 'grand_total' => $grandTotal,
-                'status' => Order::STATUS_PENDING,
+                'status' => 'pending',
                 'table_number' => $tableNumber,
                 'payment_method' => $validated['payment_method'],
-                'payment_status' => Order::PAYMENT_STATUS_PENDING,
                 'note' => $validated['note'] ?? null,
             ]);
 
             foreach ($cart as $itemId => $item) {
                 $lineSubtotal = $item['price'] * $item['qty'];
-                $lineTax = (int) round($lineSubtotal * 0.1);
 
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'item_id' => $itemId,
+                    'item_id' => $item['id'],
                     'quantity' => $item['qty'],
-                    'price' => $lineSubtotal,
-                    'tax' => $lineTax,
-                    'total_price' => $lineSubtotal + $lineTax,
+                    'price' => $item['price'],
+                    'tax' => 0.1 * $lineSubtotal,
+                    'total_price' => $lineSubtotal + (0.1 * $lineSubtotal),
                 ]);
-            } return $order;
+            }
+
+            $order->load('user');
+            return $order;
         });
 
+        $cartItems = $cart;
         Session::forget('cart');
 
-        return redirect()->route('checkout.success', [
-            'orderId' => $order->order_code
-        ]);
+        if ($validated['payment_method'] === 'tunai' || $validated['payment_method'] === 'cash') {
+            return response()->json([
+                'status' => 'success',
+                'redirect_url' => route('checkout.success', ['orderId' => $order->order_code]),
+            ]);
+        }
+
+        \Midtrans\Config::$serverKey = config('midtrans.server_key') ?? config('services.midtrans.server_key') ?? env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$clientKey = config('midtrans.client_key') ?? config('services.midtrans.client_key') ?? env('MIDTRANS_CLIENT_KEY');
+        \Midtrans\Config::$isProduction = (bool) (config('midtrans.is_production') ?? env('MIDTRANS_IS_PRODUCTION', false));
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        $itemDetails = [];
+        foreach ($cartItems as $item) {
+            $itemDetails[] = [
+                'id' => (string) $item['id'],
+                'price' => (int) $item['price'],
+                'quantity' => (int) $item['qty'],
+                'name' => substr($item['name'], 0, 50),
+            ];
+        }
+
+        if ($tax > 0) {
+            $itemDetails[] = [
+                'id' => 'TAX-10',
+                'price' => (int) $tax,
+                'quantity' => 1,
+                'name' => 'Tax (10%)',
+            ];
+        }
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->order_code,
+                'gross_amount' => (int) $order->grand_total,
+            ],
+            'item_details' => $itemDetails,
+            'customer_details' => [
+                'first_name' => $order->user->fullname ?? 'Customer',
+                'phone' => $order->user->phone,
+            ],
+        ];
+
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            return response()->json([
+                'status' => 'success',
+                'snapToken' => $snapToken,
+                'order_code' => $order->order_code,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Midtrans Error: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function checkoutSuccess($orderId)
     {
-        dd($orderId);
-    $order = Order::where('order_code', $orderId)->first();
+        $order = Order::where('order_code', $orderId)->first();
 
-    if (! $order) {
-        return redirect()
-            ->route('menu.index')
-            ->with('error', 'Order not found');
+        if (! $order) {
+            return redirect()
+                ->route('menu.index')
+                ->with('error', 'Order not found');
+        }
+
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+        if ($order->payment_method === 'qris' && $order->status === 'pending') {
+            $order->update([
+                'status' => 'settlement',
+            ]);
+        }
+
+        return view('customer.success', compact(
+            'order',
+            'orderItems'
+        ));
     }
-
-    $orderItems = OrderItem::where('order_id', $order->id)->get();
-
-    if ($order->payment_method === Order::PAYMENT_METHOD_QRIS) {
-
-        $order->update([
-            'status' => Order::STATUS_SETTLEMENT,
-        ]);
-
-        return redirect()->route('menu.qris', [
-            'orderId' => $order->order_code
-        ]);
-    }
-
-    return view('customer.success', compact(
-        'order',
-        'orderItems'
-    ));
-}
 }
