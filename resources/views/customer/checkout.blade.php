@@ -21,7 +21,10 @@
                         <div class="col-md-12 col-lg-4">
                             <div class="form-item w-100">
                                 <label class="form-label my-3">WhatsApp Number<sup>*</sup></label>
-                                <input type="text" name="phone" class="form-control" placeholder="Enter your WhatsApp number" required>
+                                <input type="tel" name="phone" class="form-control" 
+                                    placeholder="Enter your WhatsApp number" 
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                                    minlength="10" maxlength="15" required>
                             </div>
                         </div>
                         <div class="col-md-12 col-lg-4">
@@ -63,10 +66,10 @@
                                         @endphp
                                         <tr>
                                             <td>
-                                                <img src="https://loremflickr.com/80/80/{{ isset($item['category']) && !empty($item['category']) ? strtolower($item['category']) : 'food' }}"
-                                                     class="img-fluid rounded-circle"
-                                                     style="width:48px; height:48px;"
-                                                     alt="{{ $item['name'] }}">
+                                                <img src="{{ isset($item['img']) && $item['img'] ? (str_starts_with($item['img'], 'http') ? $item['img'] : asset('img_item_upload/' . $item['img'])) : asset('assets/admin/static/images/samples/error-404.svg') }}"
+                                                    class="img-fluid rounded-circle"
+                                                    style="width:48px; height:48px; object-fit: cover;"
+                                                    alt="{{ $item['name'] }}">
                                             </td>
                                             <td>{{ $item['name'] }}</td>
                                             <td>${{ number_format($item['price'], 0, ',', '.') }}</td>
@@ -132,6 +135,7 @@
     </div>
 </div>
 
+@push('scripts')
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') ?? config('midtrans.client_key') }}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -155,7 +159,13 @@
 
             const paymentMethodInput = document.querySelector('input[name="payment_method"]:checked');
             if (!paymentMethodInput) {
-                alert("Please select a payment method");
+                // Warning alert if no payment method is selected
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Please select a payment method.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0d6efd'
+                });
                 return;
             }
 
@@ -181,13 +191,13 @@
                 return data;
             })
             .then(data => {
-                // Jika Cash, langsung arahkan ke halaman sukses
+                // Direct redirect for Cash payment method
                 if (data.redirect_url) {
                     window.location.href = data.redirect_url;
                     return;
                 }
 
-                // Jika QRIS, munculkan popup Snap
+                // Trigger Midtrans Snap popup for QRIS
                 if (data.snapToken) {
                     window.snap.pay(data.snapToken, {
                         onSuccess: function (result) {
@@ -197,22 +207,44 @@
                             window.location.href = "{{ url('/checkout/success') }}/" + data.order_code;
                         },
                         onError: function (result) {
-                            alert("Payment failed!");
+                            // Error alert from Midtrans
+                            Swal.fire({
+                                title: 'Payment Failed',
+                                text: 'Your transaction could not be completed.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
                             resetButton();
                         },
                         onClose: function () {
-                            alert("Payment popup closed.");
+                            // Info alert if user closes Snap popup
+                            Swal.fire({
+                                title: 'Payment Cancelled',
+                                text: 'You closed the payment window before completing the transaction.',
+                                icon: 'info',
+                                confirmButtonColor: '#6c757d'
+                            });
                             resetButton();
                         }
                     });
                 } else {
-                    alert("Failed to retrieve Snap Token");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to retrieve payment token.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
                     resetButton();
                 }
             })
             .catch(error => {
                 console.error("Error:", error);
-                alert(error.message);
+                Swal.fire({
+                    title: 'System Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
                 resetButton();
             });
 
@@ -224,4 +256,5 @@
         });
     });
 </script>
+@endpush
 @endsection
