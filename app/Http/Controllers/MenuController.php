@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -199,7 +201,6 @@ class MenuController extends Controller
         });
 
         $cartItems = $cart;
-        Session::forget('cart');
 
         if ($validated['payment_method'] === 'tunai' || $validated['payment_method'] === 'cash') {
             return response()->json([
@@ -214,29 +215,47 @@ class MenuController extends Controller
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
 
+        $exchangeRate = Cache::remember('usd_to_idr_rate', 86400, function () {
+            try {
+                $response = Http::get('https://open.er-api.com/v6/latest/USD');
+                if ($response->successful()) {
+                    return (int) $response->json()['rates']['IDR'];
+                }
+            } catch (\Exception $e) {
+                return 16000;
+            }
+            return 16000;
+        });
+
+        $midtransGrossAmount = 0;
         $itemDetails = [];
+
         foreach ($cartItems as $item) {
+            $convertedPrice = (int) round($item['price'] * $exchangeRate);
             $itemDetails[] = [
                 'id' => (string) $item['id'],
-                'price' => (int) $item['price'],
+                'price' => $convertedPrice,
                 'quantity' => (int) $item['qty'],
                 'name' => substr($item['name'], 0, 50),
             ];
+            $midtransGrossAmount += ($convertedPrice * (int) $item['qty']);
         }
 
         if ($tax > 0) {
+            $convertedTax = (int) round($tax * $exchangeRate);
             $itemDetails[] = [
                 'id' => 'TAX-10',
-                'price' => (int) $tax,
+                'price' => $convertedTax,
                 'quantity' => 1,
                 'name' => 'Tax (10%)',
             ];
+            $midtransGrossAmount += $convertedTax;
         }
 
         $params = [
             'transaction_details' => [
                 'order_id' => $order->order_code,
-                'gross_amount' => (int) $order->grand_total,
+                'gross_amount' => $midtransGrossAmount, 
             ],
             'item_details' => $itemDetails,
             'customer_details' => [
@@ -278,6 +297,7 @@ class MenuController extends Controller
                 'status' => 'settlement',
             ]);
         }
+        Session::forget('cart');
 
         return view('customer.success', compact(
             'order',
