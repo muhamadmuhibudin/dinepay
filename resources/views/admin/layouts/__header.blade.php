@@ -13,4 +13,6 @@
     <link rel="stylesheet" crossorigin href="{{ asset('assets/admin/compiled/css/app-dark.css') }}">
     <link rel="stylesheet" crossorigin href="{{ asset('assets/admin/compiled/css/iconly.css') }}">
     <link rel="stylesheet" crossorigin href="{{ asset('assets/admin/extensions/bootstrap-icons/font/bootstrap-icons.min.css') }}">
+
+    @yield('css')
 </head>
