@@ -45,33 +45,47 @@
                     <ul class="menu">
                         <li class="sidebar-title">Menu</li>
                         
-                        <li class="sidebar-item active ">
-                            <a href="{{ route('admin.dashboard') }}" class='sidebar-link'>
+                        <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                            <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : '#' }}" class='sidebar-link'>
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
 
-                        <li class="sidebar-item">
-                            <a href="{{ route('admin.categories.index') }}" class='sidebar-link'>
+                        <li class="sidebar-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                            <a href="{{ Route::has('admin.orders.index') ? route('admin.orders.index') : '#' }}" class='sidebar-link'>
                                 <i class="bi bi-card-list"></i>
-                                <span>Daftar Menu</span>
+                                <span>Orders</span>
                             </a>
                         </li>
 
-                        <li class="sidebar-item">
-                            <a href="{{ route('admin.categories.index') }}" class='sidebar-link'>
+                        <li class="sidebar-item {{ request()->routeIs('admin.items.*') ? 'active' : '' }}">
+                            <a href="{{ Route::has('admin.items.index') ? route('admin.items.index') : '#' }}" class='sidebar-link'>
                                 <i class="bi bi-cart-fill"></i>
-                                <span>Kelola Pesanan</span>
+                                <span>Menu Items</span>
                             </a>
                         </li>
 
-                        <li class="sidebar-item">
-                            <a href="{{ route('admin.user.index') }}" class='sidebar-link'>
-                                <i class="bi bi-person-fill"></i>
-                                <span>Manajemen Karyawan</span>
+                        <li class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <a href="{{ Route::has('admin.users.index') ? route('admin.users.index') : '#' }}" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Manage Employees</span>
                             </a>
                         </li>
+
+                        <li class="sidebar-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                            <a href="{{ Route::has('admin.roles.index') ? route('admin.roles.index') : '#' }}" class='sidebar-link'>
+                                <i class="bi bi-shield-lock-fill"></i>
+                                <span>Manage Roles</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                            <a href="{{ Route::has('admin.categories.index') ? route('admin.categories.index') : '#' }}" class='sidebar-link'>
+                                <i class="bi bi-tags-fill"></i>
+                                <span>Manage Categories</span>
+                            </a>
+                        </li>   
                     </ul>
                 </div>
             </div>
