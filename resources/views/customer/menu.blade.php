@@ -33,12 +33,22 @@
                                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                                 <h4>{{$item->name}}</h4>
                                                 <p class="text-limited">{{$item->description}}</p>
-                                                <div class="d-flex justify-content-between flex-lg-wrap">
+                                                @php 
+                                                    $cartSession = session('cart', []); 
+                                                    $currentQty = isset($cartSession[$item->id]) ? $cartSession[$item->id]['qty'] : 0; 
+                                                @endphp
+
+                                                <div class="d-flex justify-content-between flex-lg-wrap align-items-center">
                                                     <p class="text-dark fs-5 fw-bold mb-0">
-                                                    {{ '$' . number_format($item->price, 0, ',', '.') }}</p>
-                                                    <button type="button" onclick="addToCart({{$item->id}})" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i>
-                                                        Add to Cart
+                                                        {{ '$' . number_format($item->price, 0, ',', '.') }}
+                                                    </p>
+                                                    
+                                                    <button type="button" onclick="addToCart({{ $item->id }})" class="btn border border-secondary rounded-pill px-3 text-primary position-relative">
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to Cart
+                                                        
+                                                        <span id="badge-item-{{ $item->id }}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: {{ $currentQty > 0 ? 'block' : 'none' }} !important;">
+                                                            {{ $currentQty }}
+                                                        </span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -68,21 +78,34 @@ function addToCart(menuId) {
     })
     .then(response => response.json())
     .then(data => {
-        // Display SweetAlert toast for successful addition
-        Swal.fire({
-            title: 'Success!',
-            text: data.message,
-            icon: 'success',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true
-        });
+        if(data.status === 'success') {
+            let itemBadge = document.getElementById('badge-item-' + menuId);
+            if (itemBadge) {
+                itemBadge.innerText = data.cart[menuId].qty;
+                itemBadge.style.setProperty('display', 'block', 'important');
+            }
+            
+            let navBadge = document.getElementById('navbar-cart-count');
+            if (navBadge) {
+                let uniqueItemsCount = Object.keys(data.cart).length;
+                navBadge.innerText = uniqueItemsCount;
+                navBadge.style.setProperty('display', 'flex', 'important'); 
+            }
+
+            Swal.fire({
+                title: 'Success!',
+                text: data.message,
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+        }
     })
     .catch(error => {
         console.error("Error:", error);
-        // Display SweetAlert toast for error handling
         Swal.fire({
             title: 'Error!',
             text: 'A system error occurred. Please try again.',
