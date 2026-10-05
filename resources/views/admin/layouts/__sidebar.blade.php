@@ -43,49 +43,81 @@
                 </div>
                 <div class="sidebar-menu">
                     <ul class="menu">
+                        <div class="sidebar-user px-3 py-2 text-white">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ Auth::user()->fullname ?? Auth::user()->name }}
+                            <br>
+                            <span class="text-muted">( {{ Auth::user()->role?->role_name ?? 'No Role' }} )</span>
+                        </div>
+                        
                         <li class="sidebar-title">Menu</li>
                         
-                        <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <li class="sidebar-item {{ request()->routeIs('dashboard', 'admin.dashboard') ? 'active' : '' }}">
                             <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : '#' }}" class='sidebar-link'>
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
 
-                        <li class="sidebar-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                            <a href="{{ Route::has('admin.orders.index') ? route('admin.orders.index') : '#' }}" class='sidebar-link'>
-                                <i class="bi bi-card-list"></i>
-                                <span>Orders</span>
-                            </a>
-                        </li>
+                        @php
+                            $userRole = strtolower(auth()->user()->role?->role_name ?? '');
+                        @endphp
 
-                        <li class="sidebar-item {{ request()->routeIs('admin.items.*') ? 'active' : '' }}">
-                            <a href="{{ Route::has('admin.items.index') ? route('admin.items.index') : '#' }}" class='sidebar-link'>
-                                <i class="bi bi-cart-fill"></i>
-                                <span>Menu Items</span>
-                            </a>
-                        </li>
+                        <!-- Level 1: Admin, Chef, and Cashier -->
+                        @if(in_array($userRole, ['admin', 'chef', 'cashier']))
+                            <li class="sidebar-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                                <a href="{{ Route::has('admin.orders.index') ? route('admin.orders.index') : '#' }}" class='sidebar-link'>
+                                    <i class="bi bi-card-list"></i>
+                                    <span>Orders</span>
+                                </a>
+                            </li>
 
-                        <li class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                            <a href="{{ Route::has('admin.users.index') ? route('admin.users.index') : '#' }}" class='sidebar-link'>
-                                <i class="bi bi-people-fill"></i>
-                                <span>Manage Employees</span>
-                            </a>
-                        </li>
+                            <li class="sidebar-item {{ request()->routeIs('admin.items.*') ? 'active' : '' }}">
+                                <a href="{{ Route::has('admin.items.index') ? route('admin.items.index') : '#' }}" class='sidebar-link'>
+                                    <i class="bi bi-cart-fill"></i>
+                                    <span>Menu Items</span>
+                                </a>
+                            </li>
+                        @endif
 
-                        <li class="sidebar-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                            <a href="{{ Route::has('admin.roles.index') ? route('admin.roles.index') : '#' }}" class='sidebar-link'>
-                                <i class="bi bi-shield-lock-fill"></i>
-                                <span>Manage Roles</span>
-                            </a>
-                        </li>
+                        <!-- Level 2: Just Admin and Chef -->
+                        @if(in_array($userRole, ['admin', 'chef']))
+                            <li class="sidebar-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                                <a href="{{ Route::has('admin.categories.index') ? route('admin.categories.index') : '#' }}" class='sidebar-link'>
+                                    <i class="bi bi-tags-fill"></i>
+                                    <span>Manage Categories</span>
+                                </a>
+                            </li> 
+                        @endif
 
-                        <li class="sidebar-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                            <a href="{{ Route::has('admin.categories.index') ? route('admin.categories.index') : '#' }}" class='sidebar-link'>
-                                <i class="bi bi-tags-fill"></i>
-                                <span>Manage Categories</span>
-                            </a>
-                        </li>   
+                        <!-- Level 3: Just Super Admin -->
+                        @if($userRole === 'admin')
+                            <li class="sidebar-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <a href="{{ Route::has('admin.users.index') ? route('admin.users.index') : '#' }}" class='sidebar-link'>
+                                    <i class="bi bi-people-fill"></i>
+                                    <span>Manage Employees</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                <a href="{{ Route::has('admin.roles.index') ? route('admin.roles.index') : '#' }}" class='sidebar-link'>
+                                    <i class="bi bi-shield-lock-fill"></i>
+                                    <span>Manage Roles</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        <!-- Level 0: Global Access (All Roles) -->
+                        <li class="sidebar-item">
+                            <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                                @csrf
+                                <a href="{{ route('logout') }}" class="sidebar-link text-danger" 
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="bi bi-box-arrow-left text-danger"></i>
+                                    <span class="text-danger">Logout</span>
+                                </a>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
