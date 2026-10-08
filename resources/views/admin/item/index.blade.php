@@ -74,16 +74,33 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.items.edit', $item->id) }}" class="btn btn-warning btn-sm ">
-                                        <i class="bi bi-pencil">Edit</i>
+                                    <a href="{{ route('admin.items.edit', $item->id) }}" class="btn btn-warning btn-sm mb-1">
+                                        <i class="bi bi-pencil"> Edit</i>
                                     </a>
-                                    <form action="{{ route('admin.items.destroy', $item->id) }}" method="POST" class="d-inline form-delete">
+
+                                    <form action="{{ route('admin.items.updateStatus', $item->id) }}" method="POST" class="d-inline form-toggle-status">
+                                        @csrf
+                                        @method('PATCH')
+                                        
+                                        @if($item->is_active == 1)
+                                            <input type="hidden" name="status" value="0">
+                                            <button type="button" class="btn btn-danger btn-sm mb-1 btn-toggle" data-action="inactive">
+                                                <i class="bi bi-x-circle"> Inactive</i>
+                                            </button>
+                                        @else
+                                            <input type="hidden" name="status" value="1">
+                                            <button type="button" class="btn btn-success btn-sm mb-1 btn-toggle" data-action="active">
+                                                <i class="bi bi-check-circle"> Active</i>
+                                            </button>
+                                        @endif
+                                    </form>
+                                    <!-- <form action="{{ route('admin.items.destroy', $item->id) }}" method="POST" class="d-inline form-delete">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" class="btn btn-sm btn-danger btn-delete">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
-                                    </form>
+                                    </form> -->
                                 </td>
                             </tr>
                         @endforeach
@@ -100,42 +117,6 @@
 <script src="{{'assets/admin/extensions/simple-datatables/umd/simple-datatables.js'}}"></script>
 <script src="{{'assets/admin/static/js/pages/simple-datatables.js'}}"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-delete')) {
-            e.preventDefault();
-            
-            const form = e.target.closest('.form-delete');
-            
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#435ebe',
-                cancelButtonColor: '#dc3545',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit(); 
-                }
-            })
-        }
-    });
 
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: '{{ session('success') }}',
-            showConfirmButton: true,
-            timer: 3000,
-            confirmButtonColor: '#35dc54',
-            confirmButtonText: 'Ok'
-        });
-    @endif
-</script>
 @endsection

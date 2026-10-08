@@ -119,4 +119,17 @@ class ItemController extends Controller
         return redirect()->route('admin.items.index')->with('success', 'Item deleted successfully!');
     }
 
+    public function updateStatus(Request $request, string $id)
+    {
+        $item = Item::findOrFail($id);
+        
+        $item->update([
+            'is_active' => $request->status
+        ]);
+
+        $message = $request->status == 1 ? 'Item activated successfully.' : 'Item deactivated successfully.';
+
+        return redirect()->back()->with('success', $message);
+    }
+
 }

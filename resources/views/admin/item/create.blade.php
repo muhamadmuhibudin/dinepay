@@ -95,7 +95,6 @@
                                 <label for="status">Status</label>
                                 <div class="form-check form-switch mt-2">
                                     <input type="hidden" name="is_active" value="0">
-                                    <!-- Jika old('is_active') tidak ada (baru buka halaman), defaultnya akan checked (1) -->
                                     <input type="checkbox" class="form-check-input @error('is_active') is-invalid @enderror" id="flexSwitchCheckChecked" name="is_active" value="1" {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="flexSwitchCheckChecked">Active / Inactive</label>
                                     @error('is_active')
