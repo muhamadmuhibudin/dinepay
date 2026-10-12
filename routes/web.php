@@ -80,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::match(['patch', 'put', 'post'], 'orders/{id}/settlement', [OrderController::class, 'settlement'])
                 ->name('orders.settlement');
             Route::resource('orders', OrderController::class);
+            Route::patch('admin/orders/{order}/settlement', [OrderController::class, 'settlement'])->name('admin.orders.settlement');
         });
 
         // --------------------------------------------------------

@@ -19,4 +19,18 @@ class OrderController extends Controller
         $orderItems = OrderItem::where('order_id', $order->id)->get();
         return view('admin.order.show', compact('order', 'orderItems'));
     }
+    
+    public function settlement($id)
+{
+    $order = Order::findOrFail($id);
+    
+    if ($order->status !== 'pending') {
+        return back()->with('error', 'Order is already settled.');
+    }
+
+    $order->status = 'settlement';
+    $order->save();
+    
+    return redirect()->route('admin.orders.index')->with('success', 'Order settled successfully');
+}
 }
