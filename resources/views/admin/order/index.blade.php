@@ -81,22 +81,34 @@
                                 <td>{{ $order->created_at->format('d M Y H:i') }}</td>
                                 
                                 <td>
-                                    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-info btn-sm mb-1">
-                                        <i class="bi bi-eye"> Show</i>
-                                    </a>
-                                    
-                                    @if(Auth::user()->role->role_name === 'Admin' || Auth::user()->role->role_name === 'Cashier')
-                                        @if($order->status === 'pending' && strtolower($order->payment_method) === 'cash')
-                                            <form action="{{ route('admin.orders.settlement', $order->id) }}" method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="btn btn-success btn-sm mb-1">
-                                                    <i class="bi bi-check"> Confirm Payment</i>
-                                                </button>
-                                            </form>
-                                        @endif
+                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-info btn-sm mb-1">
+                                    <i class="bi bi-eye"> Show</i>
+                                </a>
+                                
+                                @if(Auth::user()->role->role_name === 'Admin' || Auth::user()->role->role_name === 'Cashier')
+                                    @if($order->status === 'pending' && strtolower($order->payment_method) === 'cash')
+                                        <form action="{{ route('admin.orders.settlement', $order->id) }}" method="POST" class="d-inline-block">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-success btn-sm mb-1">
+                                                <i class="bi bi-check"> Confirm Payment</i>
+                                            </button>
+                                        </form>
                                     @endif
-                                </td>
+                                @endif
+
+                                @if(Auth::user()->role->role_name === 'Admin' || Auth::user()->role->role_name === 'Chef')
+                                    @if($order->status === 'settlement')
+                                        <form action="{{ route('admin.orders.process', $order->id) }}" method="POST" class="d-inline-block">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-warning btn-sm mb-1">
+                                                <i class="bi bi-fire"> Cooked</i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endif
+                            </td>
                             </tr>
                         @endforeach
                     </tbody>
