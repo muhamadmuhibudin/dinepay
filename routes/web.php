@@ -70,17 +70,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // --------------------------------------------------------
         Route::middleware(['role:admin,chef,cashier'])->group(function () {
             // Items / Menu
-            Route::match(['patch', 'put', 'post'], 'items/{id}/update-status', [ItemController::class, 'updateStatus'])
+            Route::patch('items/{id}/update-status', [ItemController::class, 'updateStatus'])
                 ->name('items.updateStatus');
             Route::resource('items', ItemController::class);
 
             // Orders
-            Route::match(['patch', 'put', 'post'], 'orders/{id}/update-status', [OrderController::class, 'updateStatus'])
+            Route::patch('orders/{id}/update-status', [OrderController::class, 'updateStatus'])
                 ->name('orders.updateStatus');
-            Route::match(['patch', 'put', 'post'], 'orders/{id}/settlement', [OrderController::class, 'settlement'])
+            
+            // Route Cashier 
+            Route::patch('orders/{id}/settlement', [OrderController::class, 'settlement'])
                 ->name('orders.settlement');
+                
+            // Route Chef 
+            Route::patch('orders/{id}/process', [OrderController::class, 'process'])
+                ->name('orders.process');
+                
             Route::resource('orders', OrderController::class);
-            Route::patch('admin/orders/{order}/settlement', [OrderController::class, 'settlement'])->name('admin.orders.settlement');
         });
 
         // --------------------------------------------------------
