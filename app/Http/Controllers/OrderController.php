@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -32,5 +33,19 @@ class OrderController extends Controller
     $order->save();
     
     return redirect()->route('admin.orders.index')->with('success', 'Order settled successfully');
+}
+
+    public function process($id)
+    {
+        $order = Order::findOrFail($id);
+        
+        if ($order->status !== 'settlement') {
+            return back()->with('error', 'Only settled orders can be marked as cooked.');
+        }
+
+        $order->status = 'cooked';
+        $order->save();
+        
+        return redirect()->route('admin.orders.index')->with('success', 'Order marked as cooked successfully!');
 }
 }
