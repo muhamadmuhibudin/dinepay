@@ -8,11 +8,13 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DashboardController;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Role;
+use Carbon\Carbon;
 
 // ==========================================
 // 1. PUBLIC & CUSTOMER ROUTES
@@ -26,9 +28,10 @@ Route::get('/', function () {
 Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 Route::get('/cart', [MenuController::class, 'cart'])->name('cart.index');
 Route::post('/cart/add', [MenuController::class, 'addToCart'])->name('cart.add');
-Route::match(['post', 'patch', 'put'], '/cart/update/{id}', [MenuController::class, 'updateCart'])->name('cart.update');
-Route::match(['delete', 'post'], '/cart/remove/{id}', [MenuController::class, 'removeFromCart'])->name('cart.remove');
-Route::post('/cart/clear', [MenuController::class, 'clearCart'])->name('cart.clear');
+
+Route::patch('/cart/update/{id}', [MenuController::class, 'updateCart'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [MenuController::class, 'removeFromCart'])->name('cart.remove');
+Route::delete('/cart/clear', [MenuController::class, 'clearCart'])->name('cart.clear');
 
 // Checkout Routes
 Route::get('/checkout', [MenuController::class, 'checkout'])->name('checkout');
@@ -43,19 +46,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Access Global (All logged-in users can access)
     Route::get('/dashboard', function () {
-        $data = [
-            'categories' => Category::all(),
-            'items'      => Item::all(),
-            'orders'     => Order::all(),
-            'users'      => User::all(),
-            'roles'      => Role::all(),
-        ];
-        return view('admin.dashboard', $data);
+    $today = Carbon::today();
+
+    $data = [
+        'categories' => Category::all(),
+        'items'      => Item::all(),
+        'orders'     => Order::all(),
+        'users'      => User::all(),
+        'roles'      => Role::all(),
+        
+        'todayOrders'  => \App\Models\Order::whereDate('created_at', $today)->count(),
+        
+        'todayRevenue' => \App\Models\Order::whereDate('created_at', $today)
+                                           ->whereIn('status', ['settlement', 'cooked'])
+                                           ->sum('grand_total'),
+                                           
+        'totalOrders'  => \App\Models\Order::count(),
+        
+        'totalRevenue' => \App\Models\Order::whereIn('status', ['settlement', 'cooked'])
+                                           ->sum('grand_total'),
+    ];
+    
+    return view('admin.dashboard', $data);
     })->name('dashboard');
 
-    Route::get('/admin/dashboard', function () {
-        return redirect()->route('dashboard');
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'index']
+    )->name('admin.dashboard');
 
     // Default Breeze Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

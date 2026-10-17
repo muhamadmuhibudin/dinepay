@@ -111,7 +111,7 @@ function updateQuantity(itemId, change) {
     }
 
     fetch("{{ url('/cart/update') }}/" + itemId, {
-        method: "POST",
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             "X-CSRF-TOKEN": "{{ csrf_token() }}"
