@@ -48,7 +48,7 @@
                             <th>Payment Method</th>
                             <th>Notes</th>
                             <th>Created At</th>
-                            <th>Action</th>
+                            <th colspan="2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
