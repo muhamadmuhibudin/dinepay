@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,14 +13,27 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['cat_name' => 'Food', 'description' => 'Healthy and delicious meals'],
-            ['cat_name' => 'Drink', 'description' => 'Refreshing and tasty beverages'],
+            [
+                'id' => 1, 
+                'cat_name' => 'Food', 
+                'description' => 'Main courses, appetizers, and hearty meals.'
+            ],
+            [
+                'id' => 2, 
+                'cat_name' => 'Drink', 
+                'description' => 'Refreshing cold beverages, juices, and hot drinks.'
+            ],
+            [
+                'id' => 3, 
+                'cat_name' => 'Dessert', 
+                'description' => 'Sweet treats and pastries to finish your meal.'
+            ],
         ];
 
         foreach ($categories as $category) {
             DB::table('categories')->updateOrInsert(
-                ['cat_name' => $category['cat_name']], 
-                ['description' => $category['description']]
+                ['id' => $category['id']],
+                $category
             );
         }
     }
