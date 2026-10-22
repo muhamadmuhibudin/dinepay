@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
-class DatabaseSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Seed the application's database.
@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@dinepay.com'],
             [
-                'name' => 'Admin DinePay',
+                'fullname' => 'Admin DinePay',
                 'password' => Hash::make('password'),
                 'role_id' => 1,
             ]
@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'cashier@dinepay.com'],
             [
-                'name' => 'Cashier DinePay',
+                'fullname' => 'Cashier DinePay',
                 'password' => Hash::make('password'),
                 'role_id' => 2,
             ]
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'chef@dinepay.com'],
             [
-                'name' => 'Chef DinePay',
+                'fullname' => 'Chef DinePay',
                 'password' => Hash::make('password'),
                 'role_id' => 3,
             ]
