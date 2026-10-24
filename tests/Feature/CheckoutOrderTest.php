@@ -36,7 +36,7 @@ class CheckoutOrderTest extends TestCase
                 'id' => $item->id,
                 'name' => $item->name,
                 'price' => $item->price,
-                'image' => $item->img,
+                'img' => $item->img,
                 'qty' => 2,
                 'category' => $category->cat_name,
             ],
@@ -54,7 +54,11 @@ class CheckoutOrderTest extends TestCase
                 'note' => 'No onions',
             ]);
 
-        $response->assertRedirect(route('menu.index'));
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'status',
+            'redirect_url'
+        ]);
 
         $this->assertDatabaseHas('orders', [
             'subtotal' => 50000,
@@ -70,7 +74,7 @@ class CheckoutOrderTest extends TestCase
         $this->assertDatabaseHas('order_items', [
             'item_id' => $item->id,
             'quantity' => 2,
-            'price' => 50000,
+            'price' => 25000,
             'tax' => 5000,
             'total_price' => 55000,
         ]);
@@ -85,7 +89,7 @@ class CheckoutOrderTest extends TestCase
                         'id' => 1,
                         'name' => 'Sushi Platter',
                         'price' => 25000,
-                        'image' => null,
+                        'img' => null,
                         'qty' => 1,
                         'category' => 'Food',
                     ],
@@ -99,8 +103,8 @@ class CheckoutOrderTest extends TestCase
                 'payment_method' => 'crypto',
             ]);
 
-        $response->assertRedirect(route('checkout'));
-        $response->assertSessionHas('error');
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['message']);
         $this->assertDatabaseCount('orders', 0);
     }
 
