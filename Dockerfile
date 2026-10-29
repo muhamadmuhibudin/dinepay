@@ -13,11 +13,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql pgsql mbstring zip exif pcntl bcmath gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 20 & NPM for Vite asset build
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -26,11 +21,8 @@ WORKDIR /app
 # Copy application files
 COPY . .
 
-# Install PHP & Frontend dependencies and build Vite assets
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && npm install \
-    && npm run build \
-    && rm -rf node_modules
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Ensure writable permissions for Laravel storage & cache
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
