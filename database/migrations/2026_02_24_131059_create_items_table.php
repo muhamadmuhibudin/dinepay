@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->integer('price');
+            $table->decimal('price', 10, 2);
             $table->unsignedBigInteger('category_id');
             $table->string('img')->nullable();
             $table->boolean('is_active')->default(true);
