@@ -16,9 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('item_id');
             $table->integer('quantity');
-            $table->integer('price');
-            $table->integer('tax');
-            $table->integer('total_price');
+            $table->decimal('price', 10, 2);
+            $table->decimal('tax', 10, 2);
+            $table->decimal('total_price', 10, 2);
             $table->softDeletes();
             $table->timestamps();
 
