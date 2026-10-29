@@ -21,5 +21,11 @@ class DatabaseSeeder extends Seeder
             ItemSeeder::class,
             UserSeeder::class,
         ]);
+
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            foreach (['roles', 'categories', 'items', 'users'] as $table) {
+                DB::statement("SELECT setval(pg_get_serial_sequence('{$table}', 'id'), COALESCE((SELECT MAX(id) FROM {$table}), 1), true)");
+            }
+        }
     }
 }
