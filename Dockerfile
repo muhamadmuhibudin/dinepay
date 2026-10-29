@@ -28,7 +28,7 @@ COPY . .
 
 # Install PHP & Frontend dependencies and build Vite assets
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && npm ci \
+    && npm install \
     && npm run build \
     && rm -rf node_modules
 
