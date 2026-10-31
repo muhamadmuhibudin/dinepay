@@ -20,29 +20,36 @@
             </div>
         </div>
         <div class="row g-5">
-            <div class="col-lg-4 col-md-6">
-                <div class="footer-item">
-                    <h4 class="text-light mb-3">Why Choose Us</h4>
-                    <p class="mb-4">We provide convenience, the best menu options, and fast service to make your dining experience more enjoyable!</p>
-                </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="footer-item">
+                <h4 class="text-light mb-3">Why Choose Us</h4>
+                <p class="mb-4">We provide convenience, the best menu options, and fast service to make your dining experience more enjoyable!</p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="footer-item">
-                    <h4 class="text-light mb-3">Contact Us</h4>
-                    <p>Address: NYSE Exchange, New York</p>
-                    <p>Email: info@dinepay.com</p>
-                    <p>Phone: +62 xxx-xxxx-xxx</p>
-                </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="footer-item">
+                <h4 class="text-light mb-3">Contact Us</h4>
+                <p class="mb-2">Address: NYSE Exchange, New York</p>
+                <p class="mb-2">Email: info@dinepay</p>
+                <p class="mb-0">Phone: +62 xxx-xxxx-xxxx</p>
             </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="d-flex flex-column text-start footer-item">
-                    <h4 class="text-light mb-3">Payment Methods</h4>
-                    <a class="btn-link" href="#">QR</a>
-                    <a class="btn-link" href="#">Cash</a>
-                    <a class="btn-link" href="#">Stripe</a>
-                    <a class="btn-link" href="#">PayPal</a>
-                </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="d-flex flex-column text-start footer-item">
+                <h4 class="text-light mb-3">Payment Methods</h4>
+                <span class="text-white-50 mb-2"><i class="fas fa-qrcode me-2"></i>QRIS (Midtrans)</span>
+                <span class="text-white-50 mb-2"><i class="fas fa-money-bill-wave me-2"></i>Cash</span>
             </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="d-flex flex-column text-start footer-item">
+                <h4 class="text-light mb-3">Staff Portal</h4>
+                <a class="btn-link" href="{{ auth()->check() ? route('dashboard') : route('login') }}">
+                    {{ auth()->check() ? 'Go to Dashboard' : 'Staff Login' }}
+                </a>
+            </div>
+        </div>
+    </div>
         </div>
     </div>
 </div>
